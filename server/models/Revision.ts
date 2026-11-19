@@ -174,10 +174,13 @@ class Revision extends ParanoidModel<
    * Build a Revision model from a Document model
    *
    * @param document The document to build from
+   * @param id Optional ID for the revision, must be set when building as the
+   * primary key cannot be changed once it has been assigned
    * @returns A Revision model
    */
-  static buildFromDocument(document: Document) {
+  static buildFromDocument(document: Document, id?: string) {
     return this.build({
+      ...(id ? { id } : {}),
       title: document.title,
       icon: document.icon,
       color: document.color,
