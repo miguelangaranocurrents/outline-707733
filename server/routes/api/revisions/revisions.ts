@@ -47,22 +47,28 @@ router.post(
       });
       authorize(user, "listRevisions", document);
     } else if (documentId) {
+      console.log("DIAG revisions.info documentId entry", documentId);
       const document = await Document.findByPk(documentId, {
         userId: user.id,
         includeViews: false,
       });
+      console.log("DIAG found document", !!document, document?.updatedBy?.id);
       authorize(user, "listRevisions", document);
       revision = Revision.buildFromDocument(document);
       revision.id = RevisionHelper.latestId(document.id);
       revision.user = document.updatedBy;
+      console.log("DIAG built revision", revision.id);
     } else {
       throw ValidationError("Either id or documentId must be provided");
     }
 
+    const presented = await presentRevision(revision);
+    console.log("DIAG presented revision", presented.id);
     ctx.body = {
-      data: await presentRevision(revision),
+      data: presented,
       policies: presentPolicies(user, [revision]),
     };
+    console.log("DIAG body set");
   }
 );
 
